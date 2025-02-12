@@ -50,8 +50,11 @@ public class MemberService {
     //트랜잭션 격리 레벨 설정으로 SERIALIZABLE은 동일한 데이터에 대해서 두 개 이상의 트랜잭션을 수행하지 못하도록 한다.
     //즉, 다른 트랜잭션을 차단시킨다. ( ex. patch가 두번 실행 되더라도 이 전 patch가 커밋되어야 다음 patch가 실행)
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
-    public Member updateMember(Member member){
+    public Member updateMember(Member member, long memberId){
+        //멤버가 DB에 존재하는지 확인
         Member findMember = findVerifiedMember(member.getMemberId());
+
+        //로그인한 멤버가 맞는지 확인
 
         //null처리를 위해서 Optional를 사용한다.
         Optional.ofNullable(member.getNickName())
@@ -81,6 +84,12 @@ public class MemberService {
         memberRepository.save(findMember);
     }
 
+    private void isAuthenticatedMember(long memberId, long authenticationMemberId){
+        if(memberId != authenticationMemberId){
+            throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED_MEMBER_ACCESS);
+        }
+    }
+
     public Member findVerifiedMember(long memberId){
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()->
@@ -89,7 +98,7 @@ public class MemberService {
         return member;
     }
 
-    private void verifyExistsEmail(String email){
+    public void verifyExistsEmail(String email){
         Optional<Member> member = memberRepository.findByEmail(email);
 
         //만약 멤버 객체가 값이 있다면(이메일이 존재한다면) true -> 예외를 던진다.

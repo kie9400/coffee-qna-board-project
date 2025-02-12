@@ -2,12 +2,14 @@ package com.springboot.auth.filter;
 
 import com.springboot.auth.jwt.JwtTokenizer;
 import com.springboot.auth.utils.AuthorityUtils;
+import com.springboot.auth.utils.MemberDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -24,11 +26,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     private final JwtTokenizer jwtTokenizer;
     //JWT 검증을 성공하면 Authenticaiton 객체에 채울 사용자의 권한을 생성하기 위해 DI
     private final AuthorityUtils authorityUtils;
+    private final MemberDetailsService memberDetailsService;
 
-    public JwtVerificationFilter(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils) {
+    public JwtVerificationFilter(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils, MemberDetailsService memberDetailsService) {
         this.jwtTokenizer = jwtTokenizer;
         this.authorityUtils = authorityUtils;
+        this.memberDetailsService = memberDetailsService;
     }
+
 
     //실제 검증을 진행하는 메서드
     @Override
@@ -47,6 +52,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         }catch (Exception e){
             request.setAttribute("exception",e);
         }
+
+        filterChain.doFilter(request, response);
     }
 
     private Map<String, Object> verifyJws(HttpServletRequest request){
@@ -66,12 +73,15 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     private void setAuthenticationToContext(Map<String, Object> claims) {
         //JWT에서 파싱한 Claims에서 username을 얻어온다.
         String username = (String) claims.get("username");
+        //SecurityContextHolder에 이메일을 넣어 UserDetails를 넣어준다. (검증된 사용자를 찾기위해)
+        //JWT에서 파싱한 username을 알아와서 그 사용자의 정보를 가져와야한다.
+        UserDetails memberDetails = memberDetailsService.loadUserByUsername(username);
 
         //JWT의 Claims에서 얻은 권한 정보를 기반으로 List<GrantedAuthority>생성
         List<GrantedAuthority> authorities = authorityUtils.createAuthorities((List) claims.get("roles"));
 
         //username과 List<GrantedAuthority>를 포함한 Authentication 객체를 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, null, authorities);
 
         //SecurityContext에 Authentication 객체 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);

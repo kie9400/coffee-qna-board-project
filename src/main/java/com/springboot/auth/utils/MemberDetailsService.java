@@ -34,6 +34,14 @@ public class MemberDetailsService implements UserDetailsService {
         return new MemberDetails(findmember);
     }
 
+    private Member getMember(String userEmail) {
+        Optional<Member> optionalMember = memberRepository.findByEmail(userEmail);
+        Member findMember =
+                optionalMember
+                        .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        return findMember;
+    }
+
     public final class MemberDetails extends Member implements UserDetails{
 
         public MemberDetails(Member member) {

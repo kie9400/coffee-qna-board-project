@@ -10,7 +10,8 @@ public enum ExceptionCode {
     COMMENT_NOT_FOUND(404,"Comment not found"),
     COMMENT_EXISTS(409,"Comment exists"),
     NOT_IMPLEMENTATION(501, "Not Implementation"),
-    INVALID_MEMBER_STATUS(400, "Invalid member status");
+    INVALID_MEMBER_STATUS(400, "Invalid member status"),
+    UNAUTHORIZED_MEMBER_ACCESS(401,"Not authorized to access this resource");
 
     @Getter
     private int status;
