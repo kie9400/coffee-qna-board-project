@@ -1,6 +1,8 @@
 package com.springboot.config;
 
 import com.springboot.auth.filter.JwtAuthenticationFilter;
+import com.springboot.auth.handler.MemberAuthenticationFailureHandler;
+import com.springboot.auth.handler.MemberAuthenticationSuccessHandler;
 import com.springboot.auth.jwt.JwtTokenizer;
 import com.springboot.auth.utils.AuthorityUtils;
 import org.springframework.context.annotation.Bean;
@@ -85,6 +87,9 @@ public class SecurityConfiguration {
             //필터 객체 생성하며 필요한 객체를 DI 시켜준다.
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer);
             jwtAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
+
+            jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
+            jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());
 
             //addfliter()는 필터 내부에서 체인필터에 등록시킨다.
             builder.addFilter(jwtAuthenticationFilter);

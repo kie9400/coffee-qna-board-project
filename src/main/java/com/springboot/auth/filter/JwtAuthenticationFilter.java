@@ -1,10 +1,12 @@
 package com.springboot.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.springboot.auth.dto.LoginDto;
 import com.springboot.auth.jwt.JwtTokenizer;
 import com.springboot.member.entity.Member;
 import lombok.SneakyThrows;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -53,7 +55,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     //인증 성공시 호출되는 메서드
-
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         //AuthenticationManager 내부에서 인증 성공시 인증된 Authentication 객체가 생성된다.
@@ -69,6 +70,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setHeader("Authorization", "Bearer " + accessToken);
         //RefreshToken를 추가한다. 액세스토큰을 재발급하기 위해 사용
         response.setHeader("Refresh", refreshToken);
+
+        String message = "로그인에 성공하셨습니다.";
+        Gson gson = new Gson();
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(gson.toJson(Map.of("message", message)));
     }
 
     //액세스 토큰 생성 메서드 구현
