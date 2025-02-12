@@ -31,6 +31,7 @@ public class Board extends TimeStampedEntity {
     private VisibilityStatus visibilityStatus = VisibilityStatus.PUBLIC;
 
     //게시판에서는 답변을 조회할 수 있어야하기에 단방향 매핑
+    @OneToOne
     @JoinColumn(name = "COMMENT_ID")
     private Comment comment;
 
