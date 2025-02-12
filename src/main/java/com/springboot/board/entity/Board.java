@@ -5,11 +5,13 @@ import com.springboot.comment.entity.Comment;
 import com.springboot.member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @NoArgsConstructor
 @Getter
+@Setter
 @Entity
 public class Board extends TimeStampedEntity {
     @Id
