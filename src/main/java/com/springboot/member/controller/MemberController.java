@@ -1,4 +1,4 @@
-package com.springboot.member.controller;
-
-public class MemberController {
-}
+//package com.springboot.member.controller;
+//
+//public class MemberController {
+//}
