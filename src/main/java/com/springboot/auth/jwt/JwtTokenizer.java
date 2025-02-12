@@ -57,11 +57,13 @@ public class JwtTokenizer {
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
         return Jwts.builder()
-                //JWT에 포함시킬 Custom Claims를 추가
+                //JWT에 포함시킬 Custom Claims를 추가 ( 인증된 사용자와 관련된 정보가 저장되어있다.)
                 .setClaims(claims)
+                //JWT 제목, 발행일자, 만료일시
                 .setSubject(subject)
                 .setIssuedAt(Calendar.getInstance().getTime())
                 .setExpiration(expiration)
+                //서명을 위한 key 객체를 설정
                 .signWith(key)
                 .compact();
     }
@@ -97,6 +99,8 @@ public class JwtTokenizer {
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
         Jwts.parserBuilder()
+                //서명에 사용된 key를 이용해 내부적으로 시그니처를 검증
+                //검증에 성공하면 JWT를 파싱하여 claims를 얻어온다.
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(jws);

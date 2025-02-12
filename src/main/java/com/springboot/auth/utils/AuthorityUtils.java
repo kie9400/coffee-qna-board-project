@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//권한 정보(목록)을 생성하기 위한 메서드
 @Component
 public class AuthorityUtils {
     @Value("${mail.address.admin}")
