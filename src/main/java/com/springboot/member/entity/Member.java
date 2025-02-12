@@ -37,10 +37,10 @@ public class Member {
     private MemberStatus memberStatus = MemberStatus.MEMBER_ACTIVE;
 
     //회원은 등록한 게시판과 답변의 정보를 조회할 수 있어야한다.
-    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
     private List<Board> boards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
     private List<Comment> comments = new ArrayList<>();
 
     public void setComment(Comment comment){
