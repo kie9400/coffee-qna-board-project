@@ -57,8 +57,9 @@ public class MemberController {
 
     @GetMapping
     public ResponseEntity getMembers(@Positive @RequestParam int page,
-                                     @Positive @RequestParam int size){
-        Page<Member> memberPage = memberService.findMembers(page - 1, size);
+                                     @Positive @RequestParam int size,
+                                     @AuthenticationPrincipal Member authenticatedmember){
+        Page<Member> memberPage = memberService.findMembers(page - 1, size, authenticatedmember.getMemberId());
         List<Member> members = memberPage.getContent();
         return new ResponseEntity<>
                 (new MultiResponseDto<>

@@ -26,7 +26,7 @@ public class Board extends TimeStampedEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private BoardStauts boardStauts = BoardStauts.QUESTION_ANSWERED;
+    private BoardStauts boardStauts = BoardStauts.QUESTION_REGISTERED;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)

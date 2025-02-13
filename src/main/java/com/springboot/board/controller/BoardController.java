@@ -39,28 +39,28 @@ public class BoardController {
     //MemberDetailsService에서 사용자 정보를 추출한다.
     //AuthenticationPrincipla 애너테이션은 Authentication에 담긴 Principle를 가져온다. (중요!)
     //즉, SecurityContext에서 MemberDetails 객체를 가져오는건데 Member를 상속받고 있어 Member 타입도 가능!
-    public ResponseEntity postOrder(@Valid @RequestBody BoardtDto.Post boardPostDto,
+    public ResponseEntity postBoard(@Valid @RequestBody BoardtDto.Post boardPostDto,
                                     @AuthenticationPrincipal Member member) {
-        Board board = boardService.createBoard(mapper.boardPostToBoard(boardPostDto), member.getMemberId());
+        Board board = boardService.createBoard(mapper.boardPostDtoToBoard(boardPostDto), member.getMemberId());
 
-        return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponse(board)), HttpStatus.CREATED);
+        return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponseDto(board)), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{board-id}")
-    public ResponseEntity patchMember(@PathVariable("board-id") @Positive long boardId,
+    public ResponseEntity patchBoard(@PathVariable("board-id") @Positive long boardId,
                                       @Valid @RequestBody BoardtDto.Patch boardPatchDto,
                                       @AuthenticationPrincipal Member member){
         boardPatchDto.setBoardId(boardId);
-        Board board = boardService.updateBoard(mapper.boardPatchToBoard(boardPatchDto), member.getMemberId());
+        Board board = boardService.updateBoard(mapper.boardPatchDtoToBoard(boardPatchDto), member.getMemberId());
 
-        return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponse(board)), HttpStatus.OK);
+        return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponseDto(board)), HttpStatus.OK);
     }
 
     @GetMapping("/{board-id}")
     public ResponseEntity getBoard(@PathVariable("board-id") @Positive long boardId,
                                    @AuthenticationPrincipal Member member){
         Board board = boardService.findBoard(boardId, member.getMemberId());
-        return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponse(board)), HttpStatus.OK);
+        return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponseDto(board)), HttpStatus.OK);
     }
 
     @GetMapping
@@ -71,11 +71,11 @@ public class BoardController {
         List<Board> boards = boardPage.getContent();
 
         return new ResponseEntity<>(new MultiResponseDto<>
-                (mapper.boardsToBoardResponses(boards),boardPage),HttpStatus.OK);
+                (mapper.boardsToBoardResponsesDtos(boards),boardPage),HttpStatus.OK);
     }
 
     @DeleteMapping("/{board-id}")
-    public ResponseEntity deleteMember(@PathVariable("board-id") @Positive long boardId,
+    public ResponseEntity deleteBoard(@PathVariable("board-id") @Positive long boardId,
                                        @AuthenticationPrincipal Member member){
         boardService.deleteBoard(boardId, member.getMemberId());
 

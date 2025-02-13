@@ -39,7 +39,7 @@ public class BoardService {
         }
 
         board.setMember(member);
-        return boardRepository.save(board);
+        return savedBoard(board);
     }
 
     //질문글 수정
@@ -49,11 +49,14 @@ public class BoardService {
         Member member = memberService.findVerifiedMember(memberId);
 
         //해당 게시판이 존재하는지 확인
-        findVerifiedBoard(board.getBoardId());
+        Board findBoard = findVerifiedBoard(board.getBoardId());
 
         //회원이 게시글의 작성자가 맞는지 확인
-        //수정은 작성자만 가능해야 하며 관리자는 할 수 없기에 작성자인지만 검증한다.
-        isBoardOwner(board, memberId);
+        //수정은 작성자, 관리자만 할 수있다.
+        //만약 관리자가 아니라면 작성자인지 검증한다.
+        if(!memberService.isAdmin(memberId)){
+            isBoardOwner(findBoard, memberId);
+        }
 
         Optional.ofNullable(board.getTitle())
                 .ifPresent(title -> board.setTitle(title));
@@ -71,7 +74,7 @@ public class BoardService {
             throw new BusinessLogicException(ExceptionCode.FORBIDDEN_OPERATION);
         }
 
-        return boardRepository.save(board);
+        return savedBoard(board);
     }
 
     //특정 질문글 조회
@@ -111,7 +114,11 @@ public class BoardService {
         isBoardOwner(board, memberId);
 
         board.setBoardStauts(Board.BoardStauts.QUESTION_DELETED);
-        boardRepository.save(board);
+        savedBoard(board);
+    }
+
+    public Board savedBoard(Board board){
+        return boardRepository.save(board);
     }
 
     //작성자 여부 확인 메서드

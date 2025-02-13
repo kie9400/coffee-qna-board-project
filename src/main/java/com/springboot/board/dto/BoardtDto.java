@@ -1,6 +1,8 @@
 package com.springboot.board.dto;
 
 import com.springboot.board.entity.Board;
+import com.springboot.comment.dto.CommentDto;
+import com.springboot.comment.entity.Comment;
 import com.springboot.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +11,8 @@ import lombok.Setter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public class BoardtDto {
@@ -27,7 +31,7 @@ public class BoardtDto {
     @Getter
     public static class Patch{
         @Setter
-        private long BoardId;
+        private long boardId;
 
         @NotBlank(message = "제목은 공백이 아니어야 합니다.")
         private String title;
@@ -47,6 +51,9 @@ public class BoardtDto {
         private String content;
         private Board.VisibilityStatus visibility;
         private Board.BoardStauts boardStauts;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+        private CommentDto.Response comment;
 
         public String getVisibility(){
             return visibility.getStatus();

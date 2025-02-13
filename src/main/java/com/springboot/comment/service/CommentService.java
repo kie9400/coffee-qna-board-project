@@ -32,28 +32,37 @@ public class CommentService {
     }
 
     //답변글 등록
-    public Comment createComment(Comment comment, long memberId){
+    public Comment createComment(long boardId, Comment comment, long memberId){
+        //존재하는 계정인지 확인한다.
+        Member findMember = memberService.findVerifiedMember(memberId);
 
+        //인증된 회원이 관리자인지 확인한다.
+        isAdminCheck(findMember.getMemberId());
+
+        //작성할 게시판 찾기
+        Board findBoard = boardService.findVerifiedBoard(boardId);
+        comment.setMember(findMember);
+
+        findBoard.setComment(comment);
+        boardService.savedBoard(findBoard);
+
+        return commentRepository.save(comment);
     }
 
     //답변글 수정
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
-    public Comment updateComment(Comment comment, long memberId){
+//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
+//    public Comment updateComment(Comment comment, long memberId){
+//
+//    }
 
-    }
-
-    //특정 답변글 조회
-    @Transactional(readOnly = true)
-    public  Comment findComment(long commentId, long memberId){
-
-    }
-    //전체 답변글 조회
-    @Transactional(readOnly = true)
-    public Page<Comment> findComments(int page, int size, String sortType){
-
-    }
-    //질문글 삭제
+    //답변글 삭제
     public void deleteComment(long commentId, long memberId){
 
+    }
+
+    public void isAdminCheck(long memberId){
+        if(!memberService.isAdmin(memberId)){
+            throw new BusinessLogicException(ExceptionCode.FORBIDDEN_OPERATION);
+        }
     }
 }
