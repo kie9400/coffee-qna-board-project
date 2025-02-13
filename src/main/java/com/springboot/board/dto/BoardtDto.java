@@ -45,11 +45,11 @@ public class BoardtDto {
         private long boardId;
         private String title;
         private String content;
-        private Board.VisibilityStatus visibilityStatus;
+        private Board.VisibilityStatus visibility;
         private Board.BoardStauts boardStauts;
 
-        public String getVisibilityStatus(){
-            return visibilityStatus.getStatusDescription();
+        public String getVisibility(){
+            return visibility.getStatus();
         }
     }
 }

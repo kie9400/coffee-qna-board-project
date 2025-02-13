@@ -90,10 +90,16 @@ public class MemberService {
     }
 
     //회원 본인이 맞는지 확인하기 위한 메서드
-    private void isAuthenticatedMember(long memberId, long authenticationMemberId){
+    public void isAuthenticatedMember(long memberId, long authenticationMemberId){
         if(memberId != authenticationMemberId){
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED_MEMBER_ACCESS);
         }
+    }
+
+    //관리자 여부 확인 메서드
+    public boolean isAdmin(long memberId){
+        Member member = findVerifiedMember(memberId);
+        return member.getRoles().contains("ADMIN");
     }
 
     public Member findVerifiedMember(long memberId){

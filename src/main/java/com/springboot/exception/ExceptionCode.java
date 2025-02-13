@@ -11,7 +11,8 @@ public enum ExceptionCode {
     COMMENT_EXISTS(409,"Comment exists"),
     NOT_IMPLEMENTATION(501, "Not Implementation"),
     INVALID_MEMBER_STATUS(400, "Invalid member status"),
-    UNAUTHORIZED_MEMBER_ACCESS(401,"Not authorized to access this resource");
+    UNAUTHORIZED_MEMBER_ACCESS(401,"Not authorized to access this resource"),
+    FORBIDDEN_OPERATION(403, "You are not allowed to create a post");
 
     @Getter
     private int status;

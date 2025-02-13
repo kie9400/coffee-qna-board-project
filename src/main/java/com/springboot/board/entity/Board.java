@@ -30,7 +30,7 @@ public class Board extends TimeStampedEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private VisibilityStatus visibilityStatus = VisibilityStatus.PUBLIC;
+    private VisibilityStatus visibility;
 
     //게시판에서는 답변을 조회할 수 있어야하기에 단방향 매핑
     @OneToOne
@@ -49,20 +49,15 @@ public class Board extends TimeStampedEntity {
     }
 
     public enum VisibilityStatus{
-        PUBLIC(1, "공개글 상태"),
-        SECRET(2, "비밀글 상태");
-
-        //분기 처리를 위해 사용할 변수선언
-        @Getter
-        private int statusNumber;
+        PUBLIC("공개글 상태"),
+        SECRET("비밀글 상태");
 
         //현재 상태를 설명하기 위해 변수선언
         @Getter
-        private String statusDescription;
+        private String status;
 
-        VisibilityStatus(int statusNumber, String statusDescription) {
-            this.statusNumber = statusNumber;
-            this.statusDescription = statusDescription;
+        VisibilityStatus(String status) {
+            this.status = status;
         }
     }
 
@@ -78,6 +73,5 @@ public class Board extends TimeStampedEntity {
         BoardStauts(String status) {
             this.status = status;
         }
-
     }
 }
