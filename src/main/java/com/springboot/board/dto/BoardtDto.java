@@ -48,12 +48,8 @@ public class BoardtDto {
         private Board.VisibilityStatus visibilityStatus;
         private Board.BoardStauts boardStauts;
 
-        public String getBoardStatus() {
-            return boardStauts.getStatus();
-        }
-
-        public int getVisibilityStatusNumber(){
-            return visibilityStatus.getStatusNumber();
+        public String getVisibilityStatus(){
+            return visibilityStatus.getStatusDescription();
         }
     }
 }

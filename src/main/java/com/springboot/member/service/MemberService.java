@@ -55,6 +55,7 @@ public class MemberService {
         Member findMember = findVerifiedMember(member.getMemberId());
 
         //로그인한 멤버가 맞는지 확인
+        isAuthenticatedMember(member.getMemberId(), memberId);
 
         //null처리를 위해서 Optional를 사용한다.
         Optional.ofNullable(member.getNickName())
@@ -78,12 +79,17 @@ public class MemberService {
                 Sort.by("memberId").descending()));
     }
 
-    public void deleteMember(long memberid){
+    public void deleteMember(long memberid, long authenticationMemberId){
+        //DB에 존재하는 회원인지 확인
         Member findMember = findVerifiedMember(memberid);
+        //회원 본인이 맞는지 확인
+        isAuthenticatedMember(memberid, authenticationMemberId);
+
         findMember.setMemberStatus(Member.MemberStatus.MEMBER_QUIT);
         memberRepository.save(findMember);
     }
 
+    //회원 본인이 맞는지 확인하기 위한 메서드
     private void isAuthenticatedMember(long memberId, long authenticationMemberId){
         if(memberId != authenticationMemberId){
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED_MEMBER_ACCESS);

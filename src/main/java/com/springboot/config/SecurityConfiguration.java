@@ -67,6 +67,7 @@ public class SecurityConfiguration {
                         .antMatchers(HttpMethod.GET, "/*/members/**").hasAnyRole("USER", "ADMIN")
                         .antMatchers(HttpMethod.DELETE, "/*/members/**").hasRole("USER")
                         .antMatchers(HttpMethod.POST, "/*/boards").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/*/boards/**").hasAnyRole("USER","ADMIN")
                         //위 설정을 제외한 모든 요청을 전부 접근을 허용
                         .anyRequest().permitAll());
         return http.build();
