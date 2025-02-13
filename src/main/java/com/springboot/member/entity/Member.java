@@ -36,7 +36,7 @@ public class Member {
     @Column(length = 20, nullable = false)
     private MemberStatus memberStatus = MemberStatus.MEMBER_ACTIVE;
 
-    //회원은 등록한 게시판과 답변의 정보를 조회할 수 있어야한다.
+    //회원은 등록한 게시판과 답변의 정보를 조회할 수 있어야한다.(양방향 매핑필요)
     @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
     private List<Board> boards = new ArrayList<>();
 

@@ -68,11 +68,17 @@ public class MemberService {
     //읽기전용 트랜잭션이기에 flush 처리와 스냅샷을 생성하지 않아 불필요한 추가 동작을 줄인다(성능최적화)
     @Transactional(readOnly = true)
     public Member findMember(long memberId){
+        //자기 자신만 조회가능? 요구조건에 없었으니 일단 pass
         return findVerifiedMember(memberId);
     }
 
     @Transactional(readOnly = true)
-    public Page<Member> findMembers(int page, int size){
+    public Page<Member> findMembers(int page, int size, long memberId){
+        //관리자 인지 확인(관리자만 회원 전체를 조회할 수 있어야한다.)
+        if(!isAdmin(memberId)){
+            throw new BusinessLogicException(ExceptionCode.FORBIDDEN_OPERATION);
+        }
+
         //모든 회원을 페이지 단위로 받아 반환 (Page 객체를 반환한다.)
         //회원 목록을 페이지네이션 및 정렬하여 조회
         return memberRepository.findAll(PageRequest.of(page, size,

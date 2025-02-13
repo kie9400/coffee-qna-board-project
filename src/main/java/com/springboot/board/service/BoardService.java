@@ -59,6 +59,17 @@ public class BoardService {
                 .ifPresent(title -> board.setTitle(title));
         Optional.ofNullable(board.getContent())
                 .ifPresent(content -> board.setContent(content));
+        Optional.ofNullable(board.getVisibility())
+                .ifPresent(visibility -> board.setVisibility(visibility));
+//      상태수정은 불가능한게 맞다. 만약 삭제된 글인데 회원이 수정가능하면 안된다.
+//      Optional.ofNullable(board.getBoardStauts())
+//              .ifPresent(status -> board.setBoardStauts(status));
+
+        //답변 완료 상태로의 수정은 관리자만 가능해야한다.
+        //글 삭제, 글 비활성화, 답변완료 상태에서는 수정이 되어서는 안된다.
+        if(!board.getBoardStauts().equals(Board.BoardStauts.QUESTION_REGISTERED)){
+            throw new BusinessLogicException(ExceptionCode.FORBIDDEN_OPERATION);
+        }
 
         return boardRepository.save(board);
     }
