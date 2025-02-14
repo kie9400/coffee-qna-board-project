@@ -59,22 +59,22 @@ public class BoardService {
         }
 
         Optional.ofNullable(board.getTitle())
-                .ifPresent(title -> board.setTitle(title));
+                .ifPresent(title -> findBoard.setTitle(title));
         Optional.ofNullable(board.getContent())
-                .ifPresent(content -> board.setContent(content));
+                .ifPresent(content -> findBoard.setContent(content));
         Optional.ofNullable(board.getVisibility())
-                .ifPresent(visibility -> board.setVisibility(visibility));
+                .ifPresent(visibility -> findBoard.setVisibility(visibility));
 //      상태수정은 불가능한게 맞다. 만약 삭제된 글인데 회원이 수정가능하면 안된다.
 //      Optional.ofNullable(board.getBoardStauts())
 //              .ifPresent(status -> board.setBoardStauts(status));
 
         //답변 완료 상태로의 수정은 관리자만 가능해야한다.
         //글 삭제, 글 비활성화, 답변완료 상태에서는 수정이 되어서는 안된다.
-        if(!board.getBoardStatus().equals(Board.BoardStatus.QUESTION_REGISTERED)){
+        if(!findBoard.getBoardStatus().equals(Board.BoardStatus.QUESTION_REGISTERED)){
             throw new BusinessLogicException(ExceptionCode.FORBIDDEN_OPERATION);
         }
 
-        return savedBoard(board);
+        return savedBoard(findBoard);
     }
 
     //특정 질문글 조회
@@ -102,19 +102,24 @@ public class BoardService {
                 break;
         }
 
+        //삭제되면 조회가 안되어야 하므로 삭제가 된 내용은 조회하지 못하게 한다.
+        //근데 관리자는 알아야하지않을까?
         Page<Board> boards = boardRepository.findByBoardStatusNot(
                 Board.BoardStatus.QUESTION_DELETED, PageRequest.of(page, size, sort));
 
         //boards에서 내용만 가져와 비밀글 유무를 파악하고 만약 비밀글이면 비밀글입니다로 출력되게 한다.
-        //만약 관리자라면 비밀글도 보여주어야 한다.
+        //만약 관리자라면 삭제글, 비밀글도 보여주어야 한다.
         if(memberService.isAdmin(memberId)){
-            return boards;
+            return boardRepository.findAll(PageRequest.of(page,size,sort));
         }else {
             boards.getContent().forEach(board -> {
                 if (board.getVisibility() == Board.VisibilityStatus.SECRET) {
                     board.setContent("비밀글입니다.");
                     board.setTitle("비밀글입니다.");
-                    //board.getComment().setContent("게시글이 비밀글입니다.");
+                    //질문 글이 비밀글인데, 답변이 달려있다고 한다면 답변글도 숨긴다.
+                    if(board.getComment() != null){
+                        board.getComment().setContent("해당 글은 비밀 글입니다.");
+                    }
                 }
             });
         }

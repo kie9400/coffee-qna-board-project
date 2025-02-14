@@ -1,6 +1,7 @@
 package com.springboot.member.service;
 
 import com.springboot.auth.utils.AuthorityUtils;
+import com.springboot.board.entity.Board;
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
@@ -92,6 +93,8 @@ public class MemberService {
         isAuthenticatedMember(memberid, authenticationMemberId);
 
         findMember.setMemberStatus(Member.MemberStatus.MEMBER_QUIT);
+        findMember.getBoards().stream()
+                        .forEach(board -> board.setBoardStatus(Board.BoardStatus.QUESTION_DEACTIVED));
         memberRepository.save(findMember);
     }
 

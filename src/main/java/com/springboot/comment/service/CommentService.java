@@ -43,11 +43,16 @@ public class CommentService {
         //작성할 게시판 찾기
         Board findBoard = boardService.findVerifiedBoard(boardId);
 
+        //게시판의 상태가 질문등록 상태이어야만 등록가능해야하지 않을까?
+        //삭제, 비활성화, 이미 답변이 완료된거면 굳이 할필요없다
+        if(!findBoard.getBoardStatus().equals(Board.BoardStatus.QUESTION_REGISTERED)){
+            throw new BusinessLogicException(ExceptionCode.BOARD_NOT_FOUND);
+        }
         //이미 답변을 작성한건지 확인한다. ( 중복여부 확인 )
         verifyExistsComment(findBoard);
 
         findBoard.setComment(comment);
-
+        findBoard.setBoardStatus(Board.BoardStatus.QUESTION_ANSWERED);
         //게시판에 답변을 등록하기 위해 적용 (단방향 관계이므로 수동으로 저장해준다.)
         //boardService.savedBoard(findBoard);
 
@@ -82,7 +87,12 @@ public class CommentService {
         //연관관계의 주인인 board와의 연관관계를 끊어야 comment의 delete가 정상적으로 적용된다.
         //양방향 매핑을 이용하면 애너테이션으로 간단하게 가능! 하지만 필요할 때만 사용해야 한다.
         board.setComment(null);
-        commentRepository.delete(findComment);
+        //삭제하면 다시 등록상태로 되돌려 주어야 한다.
+        board.setBoardStatus(Board.BoardStatus.QUESTION_REGISTERED);
+        //commentRepository.delete(findComment);
+        //db에서 삭제가아닌 상태변경으로 수정
+        findComment.setCommentStauts(Comment.CommentStauts.COMMENT_DELETED);
+        commentRepository.save(findComment);
     }
 
     //해당 글에 이미 답변이 등록되었는지 검증
