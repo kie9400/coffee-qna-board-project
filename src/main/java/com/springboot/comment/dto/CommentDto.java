@@ -19,9 +19,6 @@ public class CommentDto {
 
     @Getter
     public static class Patch{
-        @Setter
-        private long commentId;
-
         @NotBlank(message = "내용은 최소한 1글자라도 있어야 합니다.")
         private String content;
     }

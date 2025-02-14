@@ -30,6 +30,8 @@ public class Comment extends TimeStampedEntity {
             member.setComment(this);
         }
     }
+
+
     //    @Enumerated(EnumType.STRING)
 //    @Column(nullable = false, length = 20)
 //    private CommentStauts commentStauts = CommentStauts.COMMENT_REGISTERED;

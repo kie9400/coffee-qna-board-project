@@ -33,7 +33,9 @@ public class Board extends TimeStampedEntity {
     private VisibilityStatus visibility;
 
     //게시판에서는 답변을 조회할 수 있어야하기에 단방향 매핑
-    @OneToOne
+    //만약 답글이 삭제되면 연관된 질문글과의 참조를 제거해야한다.
+    //자식 객체가 데이터베이스에서 삭제되고, 부모 객체의 외래키 필드도 null로 설정
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "COMMENT_ID")
     private Comment comment;
 

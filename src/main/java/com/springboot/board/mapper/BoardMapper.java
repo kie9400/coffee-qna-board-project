@@ -27,7 +27,9 @@ public interface BoardMapper {
           comment.getCreatedAt()
         );
 
-        if (board.getVisibility() == Board.VisibilityStatus.SECRET) {
+        //글이 비공개 상태이고, 관리자가 아닐 경우 답변 내용을 감춘다.
+        if (board.getVisibility() == Board.VisibilityStatus.SECRET
+                & !board.getMember().getRoles().contains("ADMIN")) {
             responseDto.setContent("글이 비밀글 상태입니다.");
         }
         return responseDto;
