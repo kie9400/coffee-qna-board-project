@@ -3,6 +3,7 @@ package com.springboot.board.dto;
 import com.springboot.board.entity.Board;
 import com.springboot.comment.dto.CommentDto;
 import com.springboot.comment.entity.Comment;
+import com.springboot.like.entity.Like;
 import com.springboot.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,6 +55,7 @@ public class BoardtDto {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
         private CommentDto.Response comment;
+        private int likeCount;
 
         public String getVisibility(){
             return visibility.getStatus();

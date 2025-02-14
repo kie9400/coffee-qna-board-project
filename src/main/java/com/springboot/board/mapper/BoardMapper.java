@@ -43,6 +43,7 @@ public interface BoardMapper {
                 board.getModifiedAt(),
                 commentToCommentResponseDto(board.getComment(), board)
         );
+
         return responseDto;
     }
 }
