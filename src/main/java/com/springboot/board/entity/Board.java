@@ -26,7 +26,7 @@ public class Board extends TimeStampedEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private BoardStauts boardStauts = BoardStauts.QUESTION_REGISTERED;
+    private BoardStatus boardStatus = BoardStatus.QUESTION_REGISTERED;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
@@ -61,7 +61,7 @@ public class Board extends TimeStampedEntity {
         }
     }
 
-    public enum BoardStauts{
+    public enum BoardStatus{
         QUESTION_REGISTERED("질문 등록 상태"),
         QUESTION_ANSWERED("답변 완료 상태"),
         QUESTION_DELETED("질문 삭제 상태"),
@@ -70,7 +70,7 @@ public class Board extends TimeStampedEntity {
         @Getter
         private String status;
 
-        BoardStauts(String status) {
+        BoardStatus(String status) {
             this.status = status;
         }
     }

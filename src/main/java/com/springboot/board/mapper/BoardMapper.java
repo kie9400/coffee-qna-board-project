@@ -17,15 +17,19 @@ public interface BoardMapper {
     Board boardPatchDtoToBoard(BoardtDto.Patch requestBody);
     List<BoardtDto.Response> boardsToBoardResponsesDtos(List<Board> boards);
 
-    default CommentDto.Response commentToCommentResponseDto(Comment comment){
+    default CommentDto.Response commentToCommentResponseDto(Comment comment, Board board){
         if(comment == null){
-            return null;
+            return new CommentDto.Response("답변이 작성되지 않았습니다.", null);
         }
 
         CommentDto.Response responseDto = new CommentDto.Response(
           comment.getContent(),
           comment.getCreatedAt()
         );
+
+        if (board.getVisibility() == Board.VisibilityStatus.SECRET) {
+            responseDto.setContent("글이 비밀글 상태입니다.");
+        }
         return responseDto;
     }
 
@@ -36,10 +40,10 @@ public interface BoardMapper {
                 board.getTitle(),
                 board.getContent(),
                 board.getVisibility(),
-                board.getBoardStauts(),
+                board.getBoardStatus(),
                 board.getCreatedAt(),
                 board.getModifiedAt(),
-                commentToCommentResponseDto(board.getComment())
+                commentToCommentResponseDto(board.getComment(), board)
         );
         return responseDto;
     }

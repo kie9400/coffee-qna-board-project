@@ -70,7 +70,7 @@ public class BoardService {
 
         //답변 완료 상태로의 수정은 관리자만 가능해야한다.
         //글 삭제, 글 비활성화, 답변완료 상태에서는 수정이 되어서는 안된다.
-        if(!board.getBoardStauts().equals(Board.BoardStauts.QUESTION_REGISTERED)){
+        if(!board.getBoardStatus().equals(Board.BoardStatus.QUESTION_REGISTERED)){
             throw new BusinessLogicException(ExceptionCode.FORBIDDEN_OPERATION);
         }
 
@@ -88,7 +88,7 @@ public class BoardService {
     }
     //전체 질문글 조회
     @Transactional(readOnly = true)
-    public Page<Board> findBoards(int page, int size, String sortType){
+    public Page<Board> findBoards(int page, int size, String sortType, long memberId) {
         //sortType은 최신글 순, 오래된 글 순, 좋아요, 조회수 총 6가지
         Sort sort;
 
@@ -102,10 +102,27 @@ public class BoardService {
                 break;
         }
 
+        Page<Board> boards = boardRepository.findByBoardStatusNot(
+                Board.BoardStatus.QUESTION_DELETED, PageRequest.of(page, size, sort));
+
+        //boards에서 내용만 가져와 비밀글 유무를 파악하고 만약 비밀글이면 비밀글입니다로 출력되게 한다.
+        //만약 관리자라면 비밀글도 보여주어야 한다.
+        if(memberService.isAdmin(memberId)){
+            return boards;
+        }else {
+            boards.getContent().forEach(board -> {
+                if (board.getVisibility() == Board.VisibilityStatus.SECRET) {
+                    board.setContent("비밀글입니다.");
+                    board.setTitle("비밀글입니다.");
+                    //board.getComment().setContent("게시글이 비밀글입니다.");
+                }
+            });
+        }
+
+        return boards;
         //쿼리문을 이용해 VisibilityStatus가 SECRET인 값들을 제외한 값들만 조회한다.
         //SELECT * FROM board WHERE visibility != 'SECRET' 와 비슷하다.
-
-        return boardRepository.findByVisibilityNot(Board.VisibilityStatus.SECRET,PageRequest.of(page, size, sort));
+        //return boardRepository.findByVisibilityNot(Board.VisibilityStatus.SECRET,PageRequest.of(page, size, sort));
     }
     //질문글 삭제
     public void deleteBoard(long boardId, long memberId){
@@ -113,7 +130,7 @@ public class BoardService {
         Board board = findVerifiedBoard(boardId);
         isBoardOwner(board, memberId);
 
-        board.setBoardStauts(Board.BoardStauts.QUESTION_DELETED);
+        board.setBoardStatus(Board.BoardStatus.QUESTION_DELETED);
         savedBoard(board);
     }
 

@@ -66,8 +66,9 @@ public class BoardController {
     @GetMapping
     public ResponseEntity getBoards(@Positive @RequestParam int page,
                                      @Positive @RequestParam int size,
-                                    @RequestParam String sort){
-        Page<Board> boardPage = boardService.findBoards(page -1, size, sort);
+                                    @RequestParam String sort,
+                                    @AuthenticationPrincipal Member member){
+        Page<Board> boardPage = boardService.findBoards(page -1, size, sort, member.getMemberId());
         List<Board> boards = boardPage.getContent();
 
         return new ResponseEntity<>(new MultiResponseDto<>

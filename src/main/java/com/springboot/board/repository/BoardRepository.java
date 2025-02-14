@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findById(long boardId);
 
-    Page<Board> findByVisibilityNot(Board.VisibilityStatus visibility, Pageable pageable);
+    Page<Board> findByBoardStatusNot(Board.BoardStatus boardStatus, Pageable pageable);
 }

@@ -50,7 +50,7 @@ public class BoardtDto {
         private String title;
         private String content;
         private Board.VisibilityStatus visibility;
-        private Board.BoardStauts boardStauts;
+        private Board.BoardStatus boardStatus;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
         private CommentDto.Response comment;
