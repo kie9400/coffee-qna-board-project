@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 @Transactional
 @Service
@@ -38,7 +39,10 @@ public class ImageService {
         // 폴더가 존재하지 않는다면 생성한다.
         Files.createDirectories(Paths.get(uploadPath));
 
-        String imageName = file.getOriginalFilename();
+        // 중복 방지를 위해 UUID(유일한 식별자)를 추가
+        // 파일명을 랜덤이름으로 변환하여 서버에 저장한다.
+        // 언더바를 기준으로 뒤에 있는 이름이 파일명이므로 파일명을 헷갈릴 수 없음
+        String imageName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
         Path path = Paths.get(uploadDir, imageName);
 
         if (!imageName.matches(".*\\.(jpg|jpeg|png|gif)$")) {
