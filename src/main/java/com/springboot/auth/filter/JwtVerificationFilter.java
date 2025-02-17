@@ -5,6 +5,7 @@ import com.springboot.auth.utils.AuthorityUtils;
 import com.springboot.auth.utils.MemberDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 //클라이언트의 요청으로부터 받은 JWT를 검증하는 클래스
 public class JwtVerificationFilter extends OncePerRequestFilter {
@@ -27,13 +29,16 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     //JWT 검증을 성공하면 Authenticaiton 객체에 채울 사용자의 권한을 생성하기 위해 DI
     private final AuthorityUtils authorityUtils;
     private final MemberDetailsService memberDetailsService;
+    // redis에서 추가 검증을 위해 RedisTemplate DI
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public JwtVerificationFilter(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils, MemberDetailsService memberDetailsService) {
+    public JwtVerificationFilter(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils,
+                                 MemberDetailsService memberDetailsService, RedisTemplate<String, Object> redisTemplate) {
         this.jwtTokenizer = jwtTokenizer;
         this.authorityUtils = authorityUtils;
         this.memberDetailsService = memberDetailsService;
+        this.redisTemplate = redisTemplate;
     }
-
 
     //실제 검증을 진행하는 메서드
     @Override
@@ -44,6 +49,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         //발생한 예외를 HttpServletRequset의 애트리뷰트로 추가한다.
         try{
             Map<String, Object> claims = verifyJws(request);
+            // Redis에서 토큰 검증하기 위한 메서드
+            isTokenValidInRedis(claims);
             setAuthenticationToContext(claims);
         }catch (SignatureException se){
             request.setAttribute("exception",se);
@@ -97,5 +104,19 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         //즉, JWT가 Authorization header에 포함되지 않았다면
         //JWT 자격증명이 필요없는 리소스에 대한 요청이라고 판단하여 건너뛰는 것
         return authorization == null || !authorization.startsWith("Bearer");
+    }
+
+    // Redis에서 토큰을 검증하는 메서드 추가
+    private void isTokenValidInRedis(Map<String, Object> claims) {
+        String username = Optional.ofNullable((String) claims.get("username"))
+                .orElseThrow(() -> new NullPointerException("Username is null"));
+
+        // Redis에 해당 키(username)가 존재하는지 확인
+        Boolean hasKey = redisTemplate.hasKey(username);
+
+        // 키가 존재하지 않거나 null일 경우 예외를 던진다.
+        if (Boolean.FALSE.equals(hasKey)) {
+            throw new IllegalStateException("Redis key does not exist for username: " + username);
+        }
     }
 }

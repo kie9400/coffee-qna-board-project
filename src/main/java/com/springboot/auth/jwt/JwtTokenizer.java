@@ -8,6 +8,8 @@ import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -15,10 +17,19 @@ import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 //JWT 생성, 검증, 발급하는 클래스
 @Component
 public class JwtTokenizer {
+    //Redis를 통해 검증을 받기위해 탬플릿을 DI받는다. ( Redis 서버와의 상호작용 )
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public JwtTokenizer(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
     //JWT 생성 및 검증에 사용되는 Secret Key 정보
     @Getter
     @Value("${jwt.key}")
@@ -56,7 +67,7 @@ public class JwtTokenizer {
                                       String base64EncodedSecretKey){
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
-        return Jwts.builder()
+        String accessToken = Jwts.builder()
                 //JWT에 포함시킬 Custom Claims를 추가 ( 인증된 사용자와 관련된 정보가 저장되어있다.)
                 .setClaims(claims)
                 //JWT 제목, 발행일자, 만료일시
@@ -66,20 +77,34 @@ public class JwtTokenizer {
                 //서명을 위한 key 객체를 설정
                 .signWith(key)
                 .compact();
+
+        // Redis의 ListOperations 객체를 사용하여 리스트 형태로 데이터를 처리한다.
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        // claims에 저장된 이메일을 키로 accessToken 값을 추가한다.
+        valueOperations.set((String) claims.get("username"), accessToken, accessTokenExpirationMinutes, TimeUnit.MINUTES);
+        return accessToken;
     }
 
     //리플래쉬 토큰 생성 메서드
+    //액세스 토큰을 키로 사용하기위해 받아온다.
     public String generateRefreshToken(String subject,
                                        Date expiration,
-                                       String base64EncodedSecretKey){
+                                       String base64EncodedSecretKey,
+                                       String accessToken){
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(Calendar.getInstance().getTime())
                 .setExpiration(expiration)
                 .signWith(key)
                 .compact();
+
+        // Redis의 ListOperations 객체를 사용하여 리스트 형태로 데이터를 처리한다.
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        // 액세스 토큰을 키로 리프래시 토큰 값을 추가한다.
+        valueOperations.set(accessToken, refreshToken, refreshTokenExpirationMinutes, TimeUnit.MINUTES);
+        return refreshToken;
     }
 
     //JWT를 검증하여 파싱된 Claims를 반환하는 메서드
@@ -113,5 +138,18 @@ public class JwtTokenizer {
         Date expiration = calendar.getTime();
 
         return expiration;
+    }
+
+    // 로그아웃시 레디스에서 email을 기준으로 토큰 값 삭제
+    public boolean deleteRegisterToken(String username) {
+        return Optional.ofNullable(redisTemplate.hasKey(username))
+                .filter(Boolean::booleanValue) // 키가 존재할 때만 진행
+                .map(hasKey -> {
+                    String accessToken = (String) redisTemplate.opsForValue().get(username);
+                    redisTemplate.delete(accessToken);
+                    redisTemplate.delete(username);
+                    return true;
+                })
+                .orElse(false); // 키가 존재하지 않거나 삭제되지 않았을 때 false 반환
     }
 }

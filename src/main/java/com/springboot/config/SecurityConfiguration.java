@@ -11,6 +11,7 @@ import com.springboot.auth.utils.AuthorityUtils;
 import com.springboot.auth.utils.MemberDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -32,11 +33,15 @@ public class SecurityConfiguration {
     private final JwtTokenizer jwtTokenizer;
     private final AuthorityUtils authorityUtils;
     private final MemberDetailsService memberDetailsService;
+    // 검증 객체(JwtVerificationFilter)에 전달하기 위해 RedisTemplate DI
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public SecurityConfiguration(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils, MemberDetailsService memberDetailsService) {
+    public SecurityConfiguration(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils,
+                                 MemberDetailsService memberDetailsService, RedisTemplate<String, Object> redisTemplate) {
         this.jwtTokenizer = jwtTokenizer;
         this.authorityUtils = authorityUtils;
         this.memberDetailsService = memberDetailsService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Bean
@@ -118,6 +123,7 @@ public class SecurityConfiguration {
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());
 
+            // Redis에서 검증하기 위해 RedisTemplate를 생성자로 전달해준다.
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, memberDetailsService);
             //addfliter()는 필터 내부에서 체인필터에 등록시킨다.
             builder
