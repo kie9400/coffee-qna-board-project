@@ -35,7 +35,6 @@ public class Comment extends TimeStampedEntity {
         }
     }
 
-    //답변 상태는 필요없다. 글이 삭제되면 같이 삭제되고 글이 비공개면 같이 비공개이기 떄문
     public enum CommentStauts{
         COMMENT_REGISTERED("답변 등록 상태"),
         COMMENT_DELETED("질문 삭제 상태"),;

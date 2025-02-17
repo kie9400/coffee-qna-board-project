@@ -41,7 +41,8 @@ public interface BoardMapper {
                 board.getBoardStatus(),
                 board.getCreatedAt(),
                 board.getModifiedAt(),
-                commentToCommentResponseDto(board.getComment(), board)
+                commentToCommentResponseDto(board.getComment(), board),
+                board.getLikeCount()
         );
 
         return responseDto;
