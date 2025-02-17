@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -110,6 +111,15 @@ public class BoardController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    //File도 like와 같다.
+    //파일 업로드 핸들러 메서드
+    @PostMapping("/{board-id}/file")
+    public ResponseEntity uploadFile(@PathVariable("boardId") long boardId,
+                                     @RequestParam("file") MultipartFile file) {
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     //조회수 중복방지를 위해 Cookie 사용
     //쿠키는 보안이 약하다는 단점이 존재하지만 DB같은 서버에 부하를 안준다는 장점이있음
     private void preventDuplicateView(Long boardId, long memberId, HttpServletRequest request, HttpServletResponse response){
@@ -141,7 +151,7 @@ public class BoardController {
             // 새로운 쿠키를 생성하여 현재 사용자의 조회 기록을 저장한다.
             Cookie newCookie = new Cookie("boardView", "[" + memberId + "-" + boardId + "]");
             newCookie.setPath("/");
-            newCookie.setMaxAge(60 * 60 * 10);  // 쿠키 유효기간 1일
+            newCookie.setMaxAge(60 * 60 * 10);
             response.addCookie(newCookie);
         }
     }
