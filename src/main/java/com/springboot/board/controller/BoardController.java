@@ -8,6 +8,7 @@ import com.springboot.board.service.BoardService;
 import com.springboot.dto.MultiResponseDto;
 import com.springboot.dto.SingleResponseDto;
 import com.springboot.dto.messageResponseDto;
+import com.springboot.image.service.ImageService;
 import com.springboot.like.service.LikeService;
 import com.springboot.member.dto.MemberDto;
 import com.springboot.member.entity.Member;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -35,20 +37,28 @@ public class BoardController {
     private final BoardService boardService;
     private final BoardMapper mapper;
     private final LikeService likeService;
+    private final ImageService imageService;
 
-    public BoardController(BoardService boardService, BoardMapper mapper, LikeService likeService) {
+    public BoardController(BoardService boardService, BoardMapper mapper,
+                           LikeService likeService, ImageService imageService) {
         this.boardService = boardService;
         this.mapper = mapper;
         this.likeService = likeService;
+        this.imageService = imageService;
     }
+
 
     @PostMapping
     //MemberDetailsService에서 사용자 정보를 추출한다.
     //AuthenticationPrincipla 애너테이션은 Authentication에 담긴 Principle를 가져온다. (중요!)
     //즉, SecurityContext에서 MemberDetails 객체를 가져오는건데 Member를 상속받고 있어 Member 타입도 가능!
-    public ResponseEntity postBoard(@Valid @RequestBody BoardtDto.Post boardPostDto,
-                                    @AuthenticationPrincipal Member member) {
+    public ResponseEntity postBoard(@Valid @RequestPart(value = "board") BoardtDto.Post boardPostDto,
+                                    @RequestPart(value = "file", required = false) MultipartFile file,
+                                    @AuthenticationPrincipal Member member) throws IOException {
         Board board = boardService.createBoard(mapper.boardPostDtoToBoard(boardPostDto), member.getMemberId());
+        if (file != null && !file.isEmpty()) {
+            imageService.uploadFile(board.getBoardId(), file);
+        }
         //String message = "게시판이 등록되었습니다.";
 
         return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponseDto(board)), HttpStatus.CREATED);
@@ -67,6 +77,7 @@ public class BoardController {
     @GetMapping("/{board-id}")
     public ResponseEntity getBoard(@PathVariable("board-id") @Positive long boardId,
                                    @AuthenticationPrincipal Member member,
+                                   @RequestParam("file") MultipartFile file,
                                    HttpServletRequest request, HttpServletResponse response){
         Board board = boardService.findBoard(boardId, member.getMemberId());
         //조회수 증가 메서드(조회수 중복 방지도 포함한다.)
@@ -115,8 +126,8 @@ public class BoardController {
     //파일 업로드 핸들러 메서드
     @PostMapping("/{board-id}/file")
     public ResponseEntity uploadFile(@PathVariable("boardId") long boardId,
-                                     @RequestParam("file") MultipartFile file) {
-
+                                     @RequestParam("file") MultipartFile file) throws IOException {
+        imageService.uploadFile(boardId, file);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

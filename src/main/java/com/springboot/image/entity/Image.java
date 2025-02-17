@@ -1,4 +1,4 @@
-package com.springboot.file.entity;
+package com.springboot.image.entity;
 
 import com.springboot.board.entity.Board;
 import lombok.NoArgsConstructor;
@@ -9,23 +9,24 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Setter
-public class File {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fileId;
+    private Long imageId;
 
     @Column(nullable = false)
-    private String fileType; //파일형태
+    private String imageType; //파일형태
 
     @Column(nullable = false)
-    private String fileName; // 파일명
+    private String imageName; // 파일명
 
     @Column(nullable = false)
-    private String filePath; // 파일 경로
+    private String imagePath; // 파일 경로
 
     @Column(nullable = false)
-    private Long fileSize; // 파일 크기
+    private Long imageSize; // 파일 크기
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "board_id")
     private Board board;   // 게시글 ID
 }

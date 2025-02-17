@@ -18,7 +18,7 @@ spring:
   servlet:
     multipart:
       enabled: true #파일 업로드 가능여부 활성화
-      max-request: 100MB #한 번에 최대 업로드 가능 용량
+      max-request-size: 100MB #한 번에 최대 업로드 가능 용량
       max-file-size: 10MB #업로드 파일 최대 크기
 logging:
   level:
@@ -40,4 +40,5 @@ jwt:
   refresh-token-expiration-minutes: 420
 file:
   upload:
-    path: #파일을 저장할 장소
+    #
+    path: ./src/main/resources/filestorage
