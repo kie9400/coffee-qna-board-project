@@ -35,7 +35,9 @@ public class ImageService {
         Board board = boardService.findVerifiedBoard(boardId);
 
         // 실행 경로 기준으로 src/main/resources/filestorage 설정
+        // 상대 경로를 사용하기 위해 user.dir(실행 경로)를 앞에 추가한다.
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/filestorage";
+
         // 폴더가 존재하지 않는다면 생성한다.
         Files.createDirectories(Paths.get(uploadPath));
 
@@ -55,8 +57,7 @@ public class ImageService {
         // 같은 파일의 이름이 이미 있으면 덮어씌운다.
         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
-
-        // 파일을 지정된 경로에 저장
+        // 데이터베이스에 저장하기 위한 Image 엔티티 생성
         Image image = new Image();
         image.setImageName(imageName);
         image.setImagePath(path.toString());
