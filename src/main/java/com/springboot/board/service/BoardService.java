@@ -83,6 +83,7 @@ public class BoardService {
         Board board = findVerifiedBoard(boardId);
         //게시판이 비밀글인지 확인하여 비밀글이면 작성자, 관리자만 조회가능 하도록한다.
         isSecretBoard(board, memberId);
+        //board.setViewCount(board.getViewCount() + 1);
 
         return board;
     }
@@ -166,5 +167,12 @@ public class BoardService {
                 new BusinessLogicException(ExceptionCode.BOARD_NOT_FOUND));
 
         return board;
+    }
+
+    //조회수 증가 메서드
+    public void viewCountUp(long boardId){
+        //조회한 게시판을 찾는다.
+        Board board = findVerifiedBoard(boardId);
+        board.setViewCount(board.getViewCount() + 1);
     }
 }

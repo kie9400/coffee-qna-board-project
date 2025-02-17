@@ -56,6 +56,7 @@ public class BoardtDto {
         private LocalDateTime modifiedAt;
         private CommentDto.Response comment;
         private int likeCount;
+        private int viewCount;
 
         public String getVisibility(){
             return visibility.getStatus();

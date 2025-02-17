@@ -38,6 +38,9 @@ public class Board extends TimeStampedEntity {
     @Column(nullable = false)
     private int likeCount = 0;
 
+    @Column(nullable = false)
+    private int viewCount = 0;
+
     //게시판에서는 답변을 조회할 수 있어야하기에 단방향 매핑
     //만약 답글이 삭제되면 연관된 질문글과의 참조를 제거해야한다.
     @OneToOne(cascade = CascadeType.ALL)
