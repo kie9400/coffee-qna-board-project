@@ -15,6 +15,11 @@ spring:
   sql:
     init:
       data-locations: classpath*:db/h2/data.sql
+  servlet:
+    multipart:
+      enabled: true #파일 업로드 가능여부 활성화
+      max-request: 100MB #한 번에 최대 업로드 가능 용량
+      max-file-size: 10MB #업로드 파일 최대 크기
 logging:
   level:
     org:
@@ -33,3 +38,6 @@ jwt:
   key: ${JWT_SECRET_KEY}
   access-token-expiration-minutes: 10
   refresh-token-expiration-minutes: 420
+file:
+  upload:
+    path: #파일을 저장할 장소
