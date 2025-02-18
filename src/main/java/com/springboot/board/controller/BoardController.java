@@ -47,7 +47,6 @@ public class BoardController {
         this.imageService = imageService;
     }
 
-
     @PostMapping
     //MemberDetailsService에서 사용자 정보를 추출한다.
     //AuthenticationPrincipla 애너테이션은 Authentication에 담긴 Principle를 가져온다. (중요!)
@@ -56,10 +55,10 @@ public class BoardController {
                                     @RequestPart(value = "file", required = false) MultipartFile file,
                                     @AuthenticationPrincipal Member member) throws IOException {
         Board board = boardService.createBoard(mapper.boardPostDtoToBoard(boardPostDto), member.getMemberId());
+        //업로드 파일이 존재한다면 업로드를 실행한다.
         if (file != null && !file.isEmpty()) {
             imageService.uploadFile(board.getBoardId(), file);
         }
-        //String message = "게시판이 등록되었습니다.";
 
         return new ResponseEntity<>(new SingleResponseDto<>(mapper.boardToBoardResponseDto(board)), HttpStatus.CREATED);
     }

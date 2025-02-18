@@ -32,6 +32,7 @@ public class AuthController {
         // AuthService의 logout 메서드를 호출하여 로그아웃을 처리하고, 결과에 따라 HTTP 상태 코드를 반환합니다.
         authService.logout(username);
 
+
         //로그아웃이 실패하면 예외를 던진다.
         return new ResponseEntity<>(HttpStatus.OK);
     }
