@@ -14,7 +14,9 @@ public enum ExceptionCode {
     UNAUTHORIZED_MEMBER_ACCESS(401,"Not authorized to access this resource"),
     FORBIDDEN_OPERATION(403, "You are not allowed to create a board"),
     LIKE_ALREADY_EXISTS(409,"You have already liked this board."),
-    LIKE_NOT_CLICK(404, "You are not click like");
+    LIKE_NOT_CLICK(404, "You are not click like"),
+    USER_NOT_LOGGED_IN(401, "You are not logged in"),
+    LOGOUT_ERROR(409, "logout error");
 
     @Getter
     private int status;

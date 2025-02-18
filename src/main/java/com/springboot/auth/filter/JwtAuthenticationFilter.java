@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         //액세스 토큰, 리플래시 토큰 생성
         String accessToken = delegateAccessToken(member);
-        String refreshToken = delegateRefreshToken(member);
+        String refreshToken = delegateRefreshToken(member, accessToken);
 
         //response header에 accessToken를 추가한다.
         //AccessToken은 클라이언트 측에서 백엔드 측에 요청을 보낼때마다 request header에 추가해서 클라이언트 측의 자격을 증명하는 데 사용된다.
@@ -94,12 +94,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     //리플래시 토큰 생성 메서드
-    private String delegateRefreshToken(Member member){
+    private String delegateRefreshToken(Member member, String accessToken){
         String subject = member.getEmail();
         Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
         String base64EncodedSecretKey = jwtTokenizer.encodedBase64SecretKey(jwtTokenizer.getSecretKey());
 
-        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey);
+        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey, accessToken);
 
         return refreshToken;
     }

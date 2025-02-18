@@ -124,7 +124,8 @@ public class SecurityConfiguration {
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());
 
             // Redis에서 검증하기 위해 RedisTemplate를 생성자로 전달해준다.
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, memberDetailsService);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils
+                    ,memberDetailsService, redisTemplate);
             //addfliter()는 필터 내부에서 체인필터에 등록시킨다.
             builder
                     .addFilter(jwtAuthenticationFilter)
