@@ -97,6 +97,12 @@ public class BoardService {
             case "oldest": // 오래된 글 순
                 sort = Sort.by("boardId").ascending(); // 오래된순은 boardId 기준 오름차순
                 break;
+            case "likes": //좋아요 순
+                sort = Sort.by("likeCount").descending();
+                break;
+            case "views": //조회수 순
+                sort = Sort.by("viewCount").descending();
+                break;
             default:
                 //기본값은 최신글 순
                 sort = Sort.by("boardId").descending();
