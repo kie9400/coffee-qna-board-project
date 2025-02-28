@@ -31,7 +31,7 @@ public interface BoardMapper {
         return responseDto;
     }
 
-    //답변을 포함해서 Board 엔티티를 BoardtDto.Respo Nnse 변환
+    //답변을 포함해서 Board 엔티티를 BoardtDto.Response 변환
     default BoardtDto.Response boardToBoardResponseDto(Board board){
         BoardtDto.Response responseDto = new BoardtDto.Response(
                 board.getBoardId(),

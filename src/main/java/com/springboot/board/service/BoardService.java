@@ -175,6 +175,7 @@ public class BoardService {
         return board;
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     //조회수 증가 메서드
     public void viewCountUp(long boardId){
         //조회한 게시판을 찾는다.

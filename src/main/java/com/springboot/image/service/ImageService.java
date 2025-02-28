@@ -36,7 +36,7 @@ public class ImageService {
 
         // 실행 경로 기준으로 src/main/resources/filestorage 설정
         // 상대 경로를 사용하기 위해 user.dir(실행 경로)를 앞에 추가한다.
-        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/filestorage";
+        String uploadDir = System.getProperty("user.dir") + uploadPath;
 
         // 폴더가 존재하지 않는다면 생성한다.
         Files.createDirectories(Paths.get(uploadPath));

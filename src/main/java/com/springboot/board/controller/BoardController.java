@@ -76,7 +76,7 @@ public class BoardController {
     @GetMapping("/{board-id}")
     public ResponseEntity getBoard(@PathVariable("board-id") @Positive long boardId,
                                    @AuthenticationPrincipal Member member,
-                                   @RequestParam("file") MultipartFile file,
+                                   //@RequestParam("file") MultipartFile file,
                                    HttpServletRequest request, HttpServletResponse response){
         Board board = boardService.findBoard(boardId, member.getMemberId());
         //조회수 증가 메서드(조회수 중복 방지도 포함한다.)

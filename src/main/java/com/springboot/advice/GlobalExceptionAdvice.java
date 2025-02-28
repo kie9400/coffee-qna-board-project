@@ -20,6 +20,7 @@ import javax.validation.ConstraintViolationException;
 public class GlobalExceptionAdvice {
     @ExceptionHandler
     public ResponseEntity handleBusinessLogicException(BusinessLogicException e) {
+        //유효성 검증 실패시 ErrorResponse 생성
         final ErrorResponse response = ErrorResponse.of(e.getExceptionCode());
 
         return new ResponseEntity<>(response, HttpStatus.valueOf(e.getExceptionCode().getStatus()));
